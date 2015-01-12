@@ -1,9 +1,14 @@
 /** ----------------------------------------------------------------------------------
  *
- *      File            main.js
+ *      File            Pineapple.js
  *      Ported By       Young-Hwan Mun
  *      Contact         yh.msw9@gmail.com
  * 
+ * -----------------------------------------------------------------------------------
+ *   
+ *      Created By              Allen Benson G Tan on 5/19/12 
+ *      Copyright (c) 2012      WhiteWidget Inc. All rights reserved.   
+ *
  * -----------------------------------------------------------------------------------
  * 
  *      Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,21 +31,32 @@
  *
  * ----------------------------------------------------------------------------------- */ 
 
-var msw = msw || {};
-
-cc.game.onStart = function ( )
-{
-	cc.view.adjustViewPort ( true );
-	cc.view.setDesignResolutionSize ( 480, 320, cc.ResolutionPolicy.NO_BORDER );
-	cc.view.resizeWithBrowserSize ( true );
-	
-	cc.LoaderScene.preload ( RESOURCES, function ( )
+msw.Pineapple = cc.PolygonSpriteEx.extend 
+({
+	ctor:function ( )
 	{
-		var		scene = new cc.Scene ( );
-		var		layer = new msw.Game ( );
-		scene.addChild ( layer );
-		cc.director.runScene ( scene );
-	}, this );
-};
+		this._super ( );
 
-cc.game.run ( );
+		var		points = 
+		[		 
+			 61, 64,
+			 39, 64,
+			  0, 23,
+			  0, 10,
+			 11,  0,
+			 29,  0,
+			 64, 39
+		];
+
+		cp.convexHull ( points, null, 2 );
+
+		var 	body = cc.PhysicsBody.createPolygon ( points, cc.PhysicsMaterial ( 0.5, 0.2, 0.2 ) );
+		this.setPhysicsBody ( body );
+
+		this.initWithFile ( "res/Images/pineapple.png", body, true );
+
+		this.setType   ( cc.PolygonSpriteEx.Type.Pineapple );
+		this.setSplurt ( new cc.ParticleSystem ( "res/Particles/pineapple_splurt.plist" ) ); 
+		this.getSplurt ( ).stopSystem ( );			
+	},
+});

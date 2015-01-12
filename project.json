@@ -1,17 +1,44 @@
 {
-    "project_type": "javascript",
-
-    "debugMode" : 1,
-    "showFPS" : true,
-    "frameRate" : 60,
-    "id" : "gameCanvas",
-    "renderMode" : 0,
+    "project_type":"javascript",
+    "debugMode":1,
+    "showFPS":false,
+    "frameRate":60,
+    "id":"gameCanvas",
+    "renderMode":0,
     "engineDir":"frameworks/cocos2d-html5",
-
-    "modules" : ["cocos2d"],
-
-    "jsList" : [
-        "src/resource.js",
-        "src/app.js"
+    "modules":[
+        "cocos2d",
+        "extensions",
+        "external"
+    ],
+    "jsList":[
+        "src/Base/CCNodeEx.js",
+        "src/Base/CCSceneEx.js",
+        "src/Physics/Chipmunk/CCPhysicsHelper_chipmunk.js",
+        "src/Physics/Chipmunk/CCPhysicsBodyInfo_chipmunk.js",
+        "src/Physics/Chipmunk/CCPhysicsShapeInfo_chipmunk.js",
+        "src/Physics/Chipmunk/CCPhysicsJointInfo_chipmunk.js",
+        "src/Physics/Chipmunk/CCPhysicsWorldInfo_chipmunk.js",
+        "src/Physics/Chipmunk/CCPhysicsContactInfo_chipmunk.js",
+        "src/Physics/CCPhysicsShape.js",
+        "src/Physics/CCPhysicsBody.js",
+        "src/Physics/CCPhysicsJoint.js",
+        "src/Physics/CCPhysicsWorld.js",
+        "src/Physics/CCPhysicsContact.js",
+        "src/GLNode/GLNode.js",
+        "src/CCBlade/CCBlade.js",
+        "src/PRKit/PRFilledPolygon.js",
+        "src/PRKit/Triangulate.js",
+        "src/PolygonSprite/PolygonSprite.js",
+        "src/PolygonSpriteEx.js",
+        "src/VisibleRect.js",
+        "src/Watermelon.js",
+        "src/Strawberry.js",
+        "src/Pineapple.js",
+        "src/Grapes.js",
+        "src/Banana.js",
+        "src/Bomb.js",
+        "src/Game.js",
+        "src/Resource.js"
     ]
 }

@@ -1,6 +1,6 @@
 /** ----------------------------------------------------------------------------------
  *
- *      File            main.js
+ *      File            GLNode.js
  *      Ported By       Young-Hwan Mun
  *      Contact         yh.msw9@gmail.com
  * 
@@ -26,21 +26,31 @@
  *
  * ----------------------------------------------------------------------------------- */ 
 
-var msw = msw || {};
-
-cc.game.onStart = function ( )
-{
-	cc.view.adjustViewPort ( true );
-	cc.view.setDesignResolutionSize ( 480, 320, cc.ResolutionPolicy.NO_BORDER );
-	cc.view.resizeWithBrowserSize ( true );
-	
-	cc.LoaderScene.preload ( RESOURCES, function ( )
+cc.GLNode = cc.GLNode || cc.Node.extend
+({
+	ctor:function ( )
 	{
-		var		scene = new cc.Scene ( );
-		var		layer = new msw.Game ( );
-		scene.addChild ( layer );
-		cc.director.runScene ( scene );
-	}, this );
-};
+		this._super ( );
+		this.init ( );			
+	},
 
-cc.game.run ( );
+	init:function ( )
+	{
+		this._renderCmd._needDraw = true;
+		this._renderCmd.rendering =  function ( ctx )
+		{
+			cc.kmGLMatrixMode ( cc.KM_GL_MODELVIEW );
+			cc.kmGLPushMatrix ( );
+			cc.kmGLLoadMatrix ( this._stackMatrix );
+
+			this._node.draw ( ctx );
+
+			cc.kmGLPopMatrix ( );
+		};
+	},
+
+	draw:function ( ctx )
+	{
+		this._super ( ctx );		
+	}
+});

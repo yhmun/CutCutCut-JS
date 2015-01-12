@@ -1,9 +1,14 @@
 /** ----------------------------------------------------------------------------------
  *
- *      File            main.js
+ *      File            Grapes.js
  *      Ported By       Young-Hwan Mun
  *      Contact         yh.msw9@gmail.com
  * 
+ * -----------------------------------------------------------------------------------
+ *   
+ *      Created By              Allen Benson G Tan on 5/19/12 
+ *      Copyright (c) 2012      WhiteWidget Inc. All rights reserved.   
+ *
  * -----------------------------------------------------------------------------------
  * 
  *      Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,21 +31,33 @@
  *
  * ----------------------------------------------------------------------------------- */ 
 
-var msw = msw || {};
-
-cc.game.onStart = function ( )
-{
-	cc.view.adjustViewPort ( true );
-	cc.view.setDesignResolutionSize ( 480, 320, cc.ResolutionPolicy.NO_BORDER );
-	cc.view.resizeWithBrowserSize ( true );
-	
-	cc.LoaderScene.preload ( RESOURCES, function ( )
+msw.Grapes = cc.PolygonSpriteEx.extend 
+({
+	ctor:function ( )
 	{
-		var		scene = new cc.Scene ( );
-		var		layer = new msw.Game ( );
-		scene.addChild ( layer );
-		cc.director.runScene ( scene );
-	}, this );
-};
+		this._super ( );
 
-cc.game.run ( );
+		var		points = 
+		[		 
+			14, 61,
+			13, 39,
+			18, 16,
+			30,  3,
+			39,  3,
+			50, 29,
+			54, 50,
+			42, 62
+		];
+
+		cp.convexHull ( points, null, 2 );
+
+		var 	body = cc.PhysicsBody.createPolygon ( points, cc.PhysicsMaterial ( 0.5, 0.2, 0.2 ) );
+		this.setPhysicsBody ( body );
+
+		this.initWithFile ( "res/Images/grapes.png", body, true );
+
+		this.setType   ( cc.PolygonSpriteEx.Type.Grapes );
+		this.setSplurt ( new cc.ParticleSystem ( "res/Particles/grapes_splurt.plist" ) ); 
+		this.getSplurt ( ).stopSystem ( );			
+	},
+});

@@ -1,6 +1,6 @@
-/** ----------------------------------------------------------------------------------
+/* -----------------------------------------------------------------------------------
  *
- *      File            main.js
+ *      File            Resource.js
  *      Ported By       Young-Hwan Mun
  *      Contact         yh.msw9@gmail.com
  * 
@@ -26,21 +26,27 @@
  *
  * ----------------------------------------------------------------------------------- */ 
 
-var msw = msw || {};
+RESOURCES = 
+[	
+	 "res/Fonts/Marker Felt.ttf",
+	 "res/Images/bg.png",
+	 "res/Images/bomb.png",
+	 "res/Images/fruit_cut.png",
+	 "res/Images/grapes.png",
+	 "res/Images/pineapple.png",
+	 "res/Images/strawberry.png",
+	 "res/Images/streak.png",
+	 "res/Images/watermelon.png",
+	 "res/Images/x_filled.png",
+	 "res/Images/x_unfilled.png",
+	 "res/Particles/banana.png",
+	 "res/Particles/banana_splurt.plist",
+	 "res/Particles/blade_sparkle.plist",
+	 "res/Particles/explosion.plist",
+	 "res/Particles/grapes_splurt.plist",
+	 "res/Particles/pineapple_splurt.plist",
+	 "res/Particles/strawberry_splurt.plist",
+	 "res/Particles/sun_pollen.plist",
+	 "res/Particles/watermelon_splurt.plist",
+];
 
-cc.game.onStart = function ( )
-{
-	cc.view.adjustViewPort ( true );
-	cc.view.setDesignResolutionSize ( 480, 320, cc.ResolutionPolicy.NO_BORDER );
-	cc.view.resizeWithBrowserSize ( true );
-	
-	cc.LoaderScene.preload ( RESOURCES, function ( )
-	{
-		var		scene = new cc.Scene ( );
-		var		layer = new msw.Game ( );
-		scene.addChild ( layer );
-		cc.director.runScene ( scene );
-	}, this );
-};
-
-cc.game.run ( );

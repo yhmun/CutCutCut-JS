@@ -1,9 +1,14 @@
 /** ----------------------------------------------------------------------------------
  *
- *      File            main.js
+ *      File            Watermelon.js
  *      Ported By       Young-Hwan Mun
  *      Contact         yh.msw9@gmail.com
  * 
+ * -----------------------------------------------------------------------------------
+ *   
+ *      Created By              Allen Benson G Tan on 5/19/12 
+ *      Copyright (c) 2012      WhiteWidget Inc. All rights reserved.   
+ *
  * -----------------------------------------------------------------------------------
  * 
  *      Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,21 +31,32 @@
  *
  * ----------------------------------------------------------------------------------- */ 
 
-var msw = msw || {};
-
-cc.game.onStart = function ( )
-{
-	cc.view.adjustViewPort ( true );
-	cc.view.setDesignResolutionSize ( 480, 320, cc.ResolutionPolicy.NO_BORDER );
-	cc.view.resizeWithBrowserSize ( true );
-	
-	cc.LoaderScene.preload ( RESOURCES, function ( )
+msw.Watermelon = cc.PolygonSpriteEx.extend 
+({
+	ctor:function ( )
 	{
-		var		scene = new cc.Scene ( );
-		var		layer = new msw.Game ( );
-		scene.addChild ( layer );
-		cc.director.runScene ( scene );
-	}, this );
-};
-
-cc.game.run ( );
+		this._super ( );
+		
+		var		points = 
+		[		 
+			5,  15,
+			18,  7,
+			32,  5,
+			48,  7,
+			60, 14,
+			34, 59,
+			28, 59
+		];
+			    		
+		cp.convexHull ( points, null, 2 );
+		
+		var 	body = cc.PhysicsBody.createPolygon ( points, cc.PhysicsMaterial ( 0.5, 0.2, 0.2 ) );
+	    this.setPhysicsBody ( body );
+	    
+	    this.initWithFile ( "res/Images/watermelon.png", body, true );
+	
+		this.setType   ( cc.PolygonSpriteEx.Type.Watermelon );
+		this.setSplurt ( new cc.ParticleSystem ( "res/Particles/watermelon_splurt.plist" ) ); 
+		this.getSplurt ( ).stopSystem ( );			
+	},
+});

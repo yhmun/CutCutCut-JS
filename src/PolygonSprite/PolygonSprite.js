@@ -1,9 +1,14 @@
 /** ----------------------------------------------------------------------------------
  *
- *      File            main.js
+ *      File            PolygonSprite.js
  *      Ported By       Young-Hwan Mun
  *      Contact         yh.msw9@gmail.com
  * 
+ * -----------------------------------------------------------------------------------
+ *   
+ *      Created By              Hanno Bruns on 24.06.12
+ *      Copyright (c) 2012      zeiteisens. All rights reserved.  
+ *
  * -----------------------------------------------------------------------------------
  * 
  *      Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,21 +31,45 @@
  *
  * ----------------------------------------------------------------------------------- */ 
 
-var msw = msw || {};
-
-cc.game.onStart = function ( )
-{
-	cc.view.adjustViewPort ( true );
-	cc.view.setDesignResolutionSize ( 480, 320, cc.ResolutionPolicy.NO_BORDER );
-	cc.view.resizeWithBrowserSize ( true );
-	
-	cc.LoaderScene.preload ( RESOURCES, function ( )
+cc.PolygonSprite = cc.PRFilledPolygon.extend
+({
+	ctor:function ( )
 	{
-		var		scene = new cc.Scene ( );
-		var		layer = new msw.Game ( );
-		scene.addChild ( layer );
-		cc.director.runScene ( scene );
-	}, this );
-};
+		this._super ( );
+		
+		this.body = null;
+		this.isOriginal = false;
+		this.centroid = cp.vzero;
+	},
 
-cc.game.run ( );
+	initWithFile:function ( fileName, body, isOriginal )
+	{
+		var		texture = cc.textureCache.addImage ( fileName );		
+		return this.initWithTexture ( texture, body, isOriginal );
+	},
+
+	initWithTexture:function ( texture, body, isOriginal )
+	{
+		var		shape  = body.getFirstShape ( );		
+		var		count  = shape.getPointsCount ( );
+		var		points = new Array ( ); 
+		
+		for ( var i = 0; i < count; i++ )
+		{
+			var 	pos = body.local2World ( shape.getPoint ( i ) );			
+			points.push ( pos );
+		}
+				
+		this.initWithPoints ( points, texture );
+		
+		this.body = body;
+		this.isOriginal = isOriginal;
+		this.centroid = cc.PhysicsShape.getPolyonCenter ( points ); 
+
+		this.setAnchorPoint ( cp.v ( this.centroid.x / texture.getContentSize ( ).width, this.centroid.y / texture.getContentSize ( ).height ) );
+		
+		return true;
+	},
+	
+	
+});
