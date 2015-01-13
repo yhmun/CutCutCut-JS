@@ -33,8 +33,13 @@
 
 msw.TossType =
 {
-	kTossConsecutive	: 0	,
-	kTossSimultaneous	: 1 ,	
+	Consecutive		: 0	,
+	Simultaneous	: 1 ,	
+};
+
+msw.frandom_range = function ( low, high )
+{
+	return ( high - low ) * cc.random0To1 ( ) + low;
 };
 
 msw.Game = cc.Layer.extend
@@ -108,34 +113,21 @@ msw.Game = cc.Layer.extend
 	    }, this );
 	    	    
 	    /*
-
-
 		// initialize variables for cutting
 		m_pRaycastCallback = new RaycastCallback ( );
+	     */
 
-
-	    */
 		// initialize the blade sparkle particle effect
 	    this.blade_sparkle = new cc.ParticleSystem ( "res/Particles/blade_sparkle.plist" );
 	    this.blade_sparkle.stopSystem ( );
 	    this.addChild ( this.blade_sparkle, 3 );
+	    
+		// initialize all sound 
+//	    cc.audioEngine.playMusic ( "res/Sounds/nature_bgm.mp3" );		
 
-	    /*
-		// initialize all sound effects
-		m_uSwoosh = SimpleAudioEngine::sharedEngine ( )->preloadEffect ( "swoosh.wav" );
-		SimpleAudioEngine::sharedEngine ( )->preloadEffect ( "squash.wav" );
-		SimpleAudioEngine::sharedEngine ( )->preloadEffect ( "toss_consecutive.wav" );
-		SimpleAudioEngine::sharedEngine ( )->preloadEffect ( "toss_simultaneous.wav" );
-		SimpleAudioEngine::sharedEngine ( )->preloadEffect ( "toss_bomb.wav" );
-		SimpleAudioEngine::sharedEngine ( )->preloadEffect ( "lose_life.wav" );
-
-		SimpleAudioEngine::sharedEngine ( )->playBackgroundMusic ( "nature_bgm.mp3" );
-
-
-	 */
-		this.scheduleUpdate ( );
+	    this.scheduleUpdate ( );
 	},
-	
+
 	/**
 	 *	Initializes the physics
 	 */
@@ -168,12 +160,13 @@ msw.Game = cc.Layer.extend
 	 */
 	initSprites:function ( )
 	{		
-		this.caches = new Array ( 53 );
+		this.caches = new Array ( );
 
 		for ( var i = 0; i < 10; i++ )
 		{
 			var		sprite = new msw.Watermelon ( );
-			sprite.setPosition ( cp.v.add ( VisibleRect.leftBottom ( ), cc.p ( -64 * ( i + 1 ), -128 ) ) );
+			sprite.setPosition ( cp.v.add ( VisibleRect.leftBottom ( ), cc.p ( -64 * ( i + 1 ), -128 ) ) );			
+			sprite.setPosition ( cp.v.add ( VisibleRect.leftBottom ( ), cc.p ( 64 * ( i + 1 ), 128 ) ) );	
 
 			this.addChildEx ( sprite, 1 );
 			this.addChild ( sprite.getSplurt ( ), 3 );			
@@ -193,7 +186,7 @@ msw.Game = cc.Layer.extend
 		for ( var i = 0; i < 10; i++ )
 		{
 			var		sprite = new msw.Pineapple ( );
-			sprite.setPosition ( cp.v.add ( VisibleRect.leftBottom ( ), cc.p ( -64 * ( i + 1 ), -128 ) ) );
+			sprite.setPosition ( cp.v.add ( VisibleRect.leftBottom ( ), cc.p ( -64 * ( i + 1 ), -128 ) ) );			
 
 			this.addChildEx ( sprite, 1 );
 			this.addChild ( sprite.getSplurt ( ), 3 );			
@@ -213,7 +206,7 @@ msw.Game = cc.Layer.extend
 		for ( var i = 0; i < 10; i++ )
 		{
 			var		sprite = new msw.Banana ( );
-			sprite.setPosition ( cp.v.add ( VisibleRect.leftBottom ( ), cc.p ( -64 * ( i + 1 ), -128 ) ) );		
+			sprite.setPosition ( cp.v.add ( VisibleRect.leftBottom ( ), cc.p ( -64 * ( i + 1 ), -128 ) ) );
 			
 			this.addChildEx ( sprite, 1 );
 			this.addChild ( sprite.getSplurt ( ), 3 );			
@@ -349,13 +342,12 @@ msw.Game = cc.Layer.extend
 	{		
 		// tossing
 		this.spriteLoop ( );
-		/*
+	
 		// slicing
-		this->checkAndSliceObjects ( );
+		this.checkAndSliceObjects ( );
 
 		// cleaning
-		this->cleanSprites ( );
-		 */
+		this.cleanSprites ( );		
 
 		// handles the fading trail of the blade effect
 		if ( this.blade && this.blade.getPath ( ).length > 3 )
@@ -367,7 +359,14 @@ msw.Game = cc.Layer.extend
 		}		
 
 		// update the time used by the swoosh sound
-		this.time_current += delta;		
+		//this.time_current += delta;		
+		
+		for ( var i = 0; i < 10; i++ )
+		{			
+			//cc.log ( this.caches );
+			//cc.log ( this.caches [ i ].getPosition ( ).x );
+			this.caches [ i ].setPosition ( cp.v.add ( this.caches [ i ].getPosition ( ), cc.p ( 0, 1 ) ) );
+		}
 	},
 
 	/**
@@ -375,116 +374,105 @@ msw.Game = cc.Layer.extend
 	 */
 	spriteLoop:function ( )
 	{
-		/*
-		KDfloat		fCurTime = kdGetMilliseconds ( ) / 1000;
-
 		// execute only when it's time to toss sprites again
-		if ( fCurTime > m_fNextTossTime )
-		{
-			PolygonSpriteEx*	pSprite;
-			CCObject*			pObject;
-
-			KDint	nChance = kdRand ( ) % 8;
-			if ( nChance == 0 )
-			{
-				CCARRAY_FOREACH ( m_pCaches, pObject )
+		if ( this.time_current > this.next_toss_time )
+		{		
+			var		chance = parseInt ( cc.rand ( ) % 8 );
+			if ( chance == 0 )
+			{				
+				for ( var i in this.caches )
 				{
-					pSprite = (PolygonSpriteEx*) pObject;
-
-					if ( pSprite->getState ( ) == kStateIdle && pSprite->getType ( ) == kTypeBomb )
+					var		sprite =  this.caches [ i ];
+					
+					if ( sprite.getState ( ) == cc.PolygonSpriteEx.State.Idle && sprite.getType ( ) == cc.PolygonSpriteEx.Type.Bomb )
 					{
-						this->tossSprite ( pSprite );
-						SimpleAudioEngine::sharedEngine ( )->playEffect ( "toss_bomb.wav" );
+						this.tossSprite ( sprite );
+						cc.audioEngine.playEffect ( "res/Sounds/toss_bomb.wav" );	
 						break;
 					}
 				}
 			}
-
-			KDint	nRandom = random_range ( 0, 4 );
+			
 			// if we haven't run out of fruits to toss for consecutive tossing, toss another
-			Type	eType = (Type) nRandom;
-			if ( m_eCurrentTossType == kTossConsecutive && m_nQueuedForToss > 0 )
-			{
-				CCARRAY_FOREACH ( m_pCaches, pObject )
+			var		type = parseInt ( msw.frandom_range ( 0, 4 ) );
+			if ( this.current_toss_type == msw.TossType.Consecutive && this.queued_for_toss > 0 )
+			{				
+				for ( var i in this.caches )
 				{
-					pSprite = (PolygonSpriteEx*) pObject;
+					var		sprite =  this.caches [ i ];
 
-					if ( pSprite->getState ( ) == kStateIdle && pSprite->getType ( ) == eType )
+					if ( sprite.getState ( ) == cc.PolygonSpriteEx.State.Idle && sprite.getType ( ) == type )
 					{
-						this->tossSprite ( pSprite );
-						m_nQueuedForToss--;
-						SimpleAudioEngine::sharedEngine ( )->playEffect ( "toss_consecutive.wav" );
+						this.tossSprite ( sprite );
+						this.queued_for_toss--;
+						cc.audioEngine.playEffect ( "res/Sounds/toss_consecutive.wav" );
 						break;
 					}
-				}
+				}				
 			}
 			else
 			{
 				// determine toss type and number of fruits to toss
-				m_nQueuedForToss = random_range ( 3, 8 );
-				KDint  nTossType = random_range ( 0, 1 );
-
-				m_eCurrentTossType = (TossType) nTossType;
-
-				if ( m_eCurrentTossType == kTossSimultaneous )
+				this.queued_for_toss   = parseInt ( msw.frandom_range ( 3, 8 ) ); 
+				this.current_toss_type = parseInt ( msw.frandom_range ( 0, 1 ) ); 
+				
+				if ( this.current_toss_type == msw.TossType.Simultaneous )
 				{			
 					// toss fruits simultaneously
-					CCARRAY_FOREACH ( m_pCaches, pObject )
+					for ( var i in this.caches )
 					{
-						pSprite = (PolygonSpriteEx*) pObject;
+						var		sprite =  this.caches [ i ];
 
-						if ( pSprite->getState ( ) == kStateIdle && pSprite->getType ( ) == eType )
+						if ( sprite.getState ( ) == cc.PolygonSpriteEx.State.Idle && sprite.getType ( ) == type )
 						{
-							this->tossSprite ( pSprite );
-							m_nQueuedForToss--;
+							this.tossSprite ( sprite );
+							this.queued_for_toss--;
 
-	                        // get a different fruit type
-	                        nRandom = random_range ( 0, 4 );
-	                        eType = (Type) nRandom;
+	                        // get a different fruit type	                        
+	                        type = parseInt ( msw.frandom_range ( 0, 4 ) );
 
-	                        if ( m_nQueuedForToss == 0 )
+	                        if ( this.queued_for_toss == 0 )
 	                        {
 	                            break;
 	                        }
 	                    }
 	                }
 
-					SimpleAudioEngine::sharedEngine ( )->playEffect ( "toss_simultaneous.wav" );			
+					cc.audioEngine.playEffect ( "res/Sounds/toss_simultaneous.wav" );						 
 	            }
-	            else if ( m_eCurrentTossType == kTossConsecutive )
-	            {				
+				else if ( this.current_toss_type == msw.TossType.Consecutive )
+	            {				            
 	                // toss fruits consecutively
-	                CCARRAY_FOREACH ( m_pCaches, pObject )
-	                {
-						pSprite = (PolygonSpriteEx*) pObject;
+					for ( var i in this.caches )
+					{
+						var		sprite =  this.caches [ i ];
 
-	                    if ( pSprite->getState ( ) == kStateIdle && pSprite->getType ( ) == eType )
+	                    if ( sprite.getState ( ) == cc.PolygonSpriteEx.State.Idle && sprite.getType ( ) == type )
 	                    {
 	                        // just toss one fruit
-	                        this->tossSprite ( pSprite );
-							SimpleAudioEngine::sharedEngine ( )->playEffect ( "toss_consecutive.wav" );	   
-	                        m_nQueuedForToss--;
+	                        this.tossSprite ( sprite );
+							cc.audioEngine.playEffect ( "res/Sounds/toss_consecutive.wav" );	   
+	                        this.queued_for_toss--;
 	                        break;
 	                    }
-	                }				
-	            }
+	                }							 
+	            }				
 	        }
-
+	       
 	        // randomize an interval
-	        if ( m_nQueuedForToss == 0 )
+	        if ( this.queued_for_toss == 0 )
 	        {
 	            // if no more fruits to toss, set a longer interval
-	            m_fTossInterval = frandom_range ( 2, 3 );
-	            m_fNextTossTime = fCurTime + m_fTossInterval;
+	            this.toss_interval = msw.frandom_range ( 2, 3 );
+	            this.next_toss_time = this.time_current + this.toss_interval;
 	        }
 	        else 
 	        {
 	            // if more fruits to toss, set a shorter interval
-	            m_fTossInterval = frandom_range ( 0.3f, 0.8f );
-	            m_fNextTossTime = fCurTime + m_fTossInterval;
+	        	this.toss_interval = msw.frandom_range ( 0.3, 0.8 );
+	        	this.next_toss_time = this.time_current + this.toss_interval;
 	        }		
 	    }
-		 */
 	},
 
 	/**
@@ -505,7 +493,7 @@ msw.Game = cc.Layer.extend
 			{
 				CCPoint		tPosition  = ccp ( pSprite->getBody ( )->GetPosition ( ).x * PTM_RATIO, pSprite->getBody ( )->GetPosition ( ).y * PTM_RATIO );
 				KDfloat		fVelocityY = pSprite->getBody ( )->GetLinearVelocity ( ).y;
-		        
+
 				// this means the sprite has dropped offscreen
 				if ( tPosition.y < -64 && fVelocityY < 0 )
 				{
@@ -555,11 +543,15 @@ msw.Game = cc.Layer.extend
 	 */
 	tossSprite:function ( sprite )
 	{
-		/*
-		const CCSize&	tWinSize = CCDirector::sharedDirector ( )->getWinSize ( );
-
+		return;
 		// set a random position and rotation rate
-		CCPoint		tRandomPosition = ccp ( frandom_range ( 100, tWinSize.cx - 164 ), -64 );
+		var			random_position = cp.v ( msw.frandom_range ( VisibleRect.left ( ).x + 128, VisibleRect.right ( ).x - 128 ), VisibleRect.bottom ( ).y - 128 );
+		
+		random_position.y = 128;
+		
+		//sprite.setPosition ( cp.v.add ( VisibleRect.leftBottom ( ), cc.p ( 64 * ( i + 1 ), 128 ) ) );
+		
+		/*
 		KDfloat		fRandomAngularVelocity = frandom_range ( -1, 1 );
 
 		// limit the velocity based on their position so that sprites aren't tossed offscreen
@@ -569,14 +561,13 @@ msw.Game = cc.Layer.extend
 
 		KDfloat		fRandomXVelocity = frandom_range ( fMin, fMax );
 		KDfloat		fRandomYVelocity = frandom_range ( 250, 300 );
-
+*/
 		// activate and toss the sprite
-		pSprite->setState ( kStateTossed );
-		pSprite->setPosition ( tRandomPosition );
-		pSprite->activateCollisions ( );
-		pSprite->getBody ( )->SetLinearVelocity ( b2Vec2 ( fRandomXVelocity / PTM_RATIO, fRandomYVelocity / PTM_RATIO ) );
-		pSprite->getBody ( )->SetAngularVelocity ( fRandomAngularVelocity );
-		*/
+//		sprite.setState ( cc.PolygonSpriteEx.State.Tossed );
+		sprite.setPosition ( random_position );
+//		sprite->activateCollisions ( );
+//		sprite->getBody ( )->SetLinearVelocity ( b2Vec2 ( fRandomXVelocity / PTM_RATIO, fRandomYVelocity / PTM_RATIO ) );
+//		sprite->getBody ( )->SetAngularVelocity ( fRandomAngularVelocity );		
 	},
 
 	/**
