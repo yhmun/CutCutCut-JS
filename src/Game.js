@@ -136,7 +136,7 @@ msw.Game = cc.Layer.extend
 		this.getParent ( ).initWithPhysics ( );
 
 		this.getParent ( ).getPhysicsWorld ( ).setDebugDrawMask ( cc.PhysicsWorld.DEBUGDRAW_ALL );
-		this.getParent ( ).getPhysicsWorld ( ).setGravity ( cp.v ( 0, 0 ) );		
+		this.getParent ( ).getPhysicsWorld ( ).setGravity ( cp.v ( 0, -120 ) );		
 	},
 
 	/**
@@ -166,8 +166,7 @@ msw.Game = cc.Layer.extend
 		{
 			var		sprite = new msw.Watermelon ( );
 			sprite.setPosition ( cp.v.add ( VisibleRect.leftBottom ( ), cc.p ( -64 * ( i + 1 ), -128 ) ) );			
-			sprite.setPosition ( cp.v.add ( VisibleRect.leftBottom ( ), cc.p ( 64 * ( i + 1 ), 128 ) ) );	
-
+	
 			this.addChildEx ( sprite, 1 );
 			this.addChild ( sprite.getSplurt ( ), 3 );			
 			this.caches.push ( sprite );
@@ -271,7 +270,7 @@ msw.Game = cc.Layer.extend
 				break;
 			}
 		}
-		
+
 		// move the sparkle to the touch
 		this.blade_sparkle.setPosition ( location );
 		this.blade_sparkle.resetSystem ( );
@@ -359,14 +358,7 @@ msw.Game = cc.Layer.extend
 		}		
 
 		// update the time used by the swoosh sound
-		//this.time_current += delta;		
-		
-		for ( var i = 0; i < 10; i++ )
-		{			
-			//cc.log ( this.caches );
-			//cc.log ( this.caches [ i ].getPosition ( ).x );
-			this.caches [ i ].setPosition ( cp.v.add ( this.caches [ i ].getPosition ( ), cc.p ( 0, 1 ) ) );
-		}
+		this.time_current += delta;				
 	},
 
 	/**
@@ -480,42 +472,38 @@ msw.Game = cc.Layer.extend
 	 */
 	cleanSprites:function ( )
 	{
-		/*
-		PolygonSpriteEx*	pSprite;
-		CCObject*			pObject;
-
-		//we check for all tossed sprites that have dropped offscreen and reset them
-		CCARRAY_FOREACH ( m_pCaches, pObject )
+		// we check for all tossed sprites that have dropped offscreen and reset them
+		for ( var i in this.caches )
 		{
-			pSprite = (PolygonSpriteEx*) pObject;
+			var		sprite =  this.caches [ i ];
 
-			if ( pSprite->getState ( ) == kStateTossed )
+			if ( sprite.getState ( ) == cc.PolygonSpriteEx.State.Tossed )
 			{
-				CCPoint		tPosition  = ccp ( pSprite->getBody ( )->GetPosition ( ).x * PTM_RATIO, pSprite->getBody ( )->GetPosition ( ).y * PTM_RATIO );
-				KDfloat		fVelocityY = pSprite->getBody ( )->GetLinearVelocity ( ).y;
-
+				var		position   = sprite.getPhysicsBody ( ).getPosition ( );
+				var		velocity_y = sprite.getPhysicsBody ( ).getVelocity ( ).y;
+				
 				// this means the sprite has dropped offscreen
-				if ( tPosition.y < -64 && fVelocityY < 0 )
+				if ( position.y < VisibleRect.bottom ( ).y - 64 && velocity_y < 0 )
 				{
-					b2Vec2		tZero ( 0, 0 );
-
-					pSprite->setState ( kStateIdle );
-					pSprite->setSliceEntered ( KD_FALSE );
-					pSprite->setSliceExited  ( KD_FALSE );
-					pSprite->setEntryPoint ( tZero );
-					pSprite->setExitPoint  ( tZero );
-					pSprite->setPosition ( ccp ( -64, -64 ) );
-					pSprite->getBody ( )->SetLinearVelocity  ( b2Vec2 (0.0f, 0.0f ) );
-					pSprite->getBody ( )->SetAngularVelocity ( 0.0f );
-					pSprite->deactivateCollisions ( );
+					sprite.setState ( cc.PolygonSpriteEx.State.Idle );
+					sprite.setSliceEntered ( false );
+					sprite.setSliceExited  ( false );
+					sprite.setEntryPoint ( cp.vzero );
+					sprite.setExitPoint  ( cp.vzero );
+					sprite.setPosition ( cp.v ( -64, -64 ) );
+					sprite.getPhysicsBody ( ).setVelocity ( cp.vzero );
+					sprite.getPhysicsBody ( ).setAngularVelocity ( 0.0 );
+					sprite.deactivateCollisions ( );
 		            
-					if ( pSprite->getType ( ) != kTypeBomb )
+					if ( sprite.getType ( ) != cc.PolygonSpriteEx.Type.Bomb )
 					{
-						this->subtractLife ( );
-					}
-				}
+						this.subtractLife ( );
+					}					 
+				}				
 			}
 		}
+		
+		/*
 
 		// we check for all sliced pieces that have dropped offscreen and remove them
 		const CCSize&	tWinSize = CCDirector::sharedDirector ( )->getWinSize ( );
@@ -543,31 +531,25 @@ msw.Game = cc.Layer.extend
 	 */
 	tossSprite:function ( sprite )
 	{
-		return;
 		// set a random position and rotation rate
-		var			random_position = cp.v ( msw.frandom_range ( VisibleRect.left ( ).x + 128, VisibleRect.right ( ).x - 128 ), VisibleRect.bottom ( ).y - 128 );
-		
-		random_position.y = 128;
-		
-		//sprite.setPosition ( cp.v.add ( VisibleRect.leftBottom ( ), cc.p ( 64 * ( i + 1 ), 128 ) ) );
-		
-		/*
-		KDfloat		fRandomAngularVelocity = frandom_range ( -1, 1 );
+		var		random_position = cp.v ( msw.frandom_range ( VisibleRect.left ( ).x + 128, VisibleRect.right ( ).x - 128 ), VisibleRect.bottom ( ).y - 128 );
+		var		random_angular_velocity = msw.frandom_range ( -1, 1 );
 
 		// limit the velocity based on their position so that sprites aren't tossed offscreen
-		KDfloat		fModifierX = 50 * ( tRandomPosition.x - 100 ) / ( tWinSize.cx - 264 );
-		KDfloat		fMin = -25.0 - fModifierX;
-		KDfloat		fMax =  75.0 - fModifierX;
+		var		modifier_x = 50 * ( random_position.x - 100 ) / ( VisibleRect.right ( ).x - 264 );
+		var		min = -25.0 - modifier_x;
+		var		max =  75.0 - modifier_x;
 
-		KDfloat		fRandomXVelocity = frandom_range ( fMin, fMax );
-		KDfloat		fRandomYVelocity = frandom_range ( 250, 300 );
-*/
+		var		random_x_velocity = msw.frandom_range ( min, max );
+		var		random_y_velocity = msw.frandom_range ( 250, 300 );
+
 		// activate and toss the sprite
-//		sprite.setState ( cc.PolygonSpriteEx.State.Tossed );
+		sprite.setState ( cc.PolygonSpriteEx.State.Tossed );
 		sprite.setPosition ( random_position );
-//		sprite->activateCollisions ( );
-//		sprite->getBody ( )->SetLinearVelocity ( b2Vec2 ( fRandomXVelocity / PTM_RATIO, fRandomYVelocity / PTM_RATIO ) );
-//		sprite->getBody ( )->SetAngularVelocity ( fRandomAngularVelocity );		
+		sprite.activateCollisions ( );
+
+		sprite.getPhysicsBody ( ).setVelocity ( cp.v ( random_x_velocity, random_y_velocity ) );
+		sprite.getPhysicsBody ( ).setAngularVelocity ( random_angular_velocity );		
 	},
 
 	/**

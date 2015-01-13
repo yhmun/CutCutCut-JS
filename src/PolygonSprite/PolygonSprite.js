@@ -61,15 +61,37 @@ cc.PolygonSprite = cc.PRFilledPolygon.extend
 		}
 				
 		this.initWithPoints ( points, texture );
-		
-		this.body = body;
+
 		this.isOriginal = isOriginal;
 		this.centroid = cc.PhysicsShape.getPolyonCenter ( points ); 
 
 		this.setAnchorPoint ( cp.v ( this.centroid.x / texture.getContentSize ( ).width, this.centroid.y / texture.getContentSize ( ).height ) );
+		this.setPhysicsBody ( body );
 		
 		return true;
 	},
+	
+	activateCollisions:function ( )
+	{
+//		this.getPhysicsBody ( ).setCategoryBitmask  ( 0x0001 );
+//		this.getPhysicsBody ( ).setCollisionBitmask ( 0x0001 );
+	},
+	
+	deactivateCollisions:function ( )
+	{
+		this.getPhysicsBody ( ).setCategoryBitmask  ( 0 );
+		this.getPhysicsBody ( ).setCollisionBitmask ( 0 );
+	},
+
+	//setPosition:function ( Position )
+	//{
+		
+	//},
+
+	//nodeToParentTransform:function ( )
+//	{
+		
+//	},
 	
 	
 });

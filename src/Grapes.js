@@ -49,10 +49,7 @@ msw.Grapes = cc.PolygonSpriteEx.extend
 			42, 62
 		];
 
-		cp.convexHull ( points, null, 2 );
-
-		var 	body = cc.PhysicsBody.createPolygon ( points, cc.PhysicsMaterial ( 0.5, 0.2, 0.2 ) );
-		this.setPhysicsBody ( body );
+		var 	body = this.createBody ( VisibleRect.center ( ), 0, points, 5, 0.2, 0.2 );
 
 		this.initWithFile ( "res/Images/grapes.png", body, true );
 

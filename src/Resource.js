@@ -30,6 +30,7 @@ RESOURCES =
 [	
 	 "res/Fonts/Marker Felt.ttf",
 	 "res/Images/bg.png",
+	 "res/Images/banana.png",
 	 "res/Images/bomb.png",
 	 "res/Images/fruit_cut.png",
 	 "res/Images/grapes.png",
@@ -39,7 +40,6 @@ RESOURCES =
 	 "res/Images/watermelon.png",
 	 "res/Images/x_filled.png",
 	 "res/Images/x_unfilled.png",
-	 "res/Particles/banana.png",
 	 "res/Particles/banana_splurt.plist",
 	 "res/Particles/blade_sparkle.plist",
 	 "res/Particles/explosion.plist",

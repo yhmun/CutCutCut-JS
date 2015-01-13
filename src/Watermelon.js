@@ -47,12 +47,9 @@ msw.Watermelon = cc.PolygonSpriteEx.extend
 			34, 59,
 			28, 59
 		];
-			    		
-		cp.convexHull ( points, null, 2 );
+			    	
+		var 	body = this.createBody ( VisibleRect.center ( ), 0, points, 5, 0.2, 0.2 );
 		
-		var 	body = cc.PhysicsBody.createPolygon ( points, cc.PhysicsMaterial ( 0.5, 0.2, 0.2 ) );
-	    this.setPhysicsBody ( body );
-	    
 	    this.initWithFile ( "res/Images/watermelon.png", body, true );
 	
 		this.setType   ( cc.PolygonSpriteEx.Type.Watermelon );

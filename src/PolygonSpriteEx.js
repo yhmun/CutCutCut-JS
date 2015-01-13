@@ -36,7 +36,7 @@ cc.PolygonSpriteEx = cc.PolygonSprite.extend
 	ctor:function ( )
 	{
 		this._super ( );		
-		
+
 		this.splurt 			= null;
 		this.slice_entered 		= false;
 		this.slice_exited  		= false;		
@@ -133,6 +133,18 @@ cc.PolygonSpriteEx = cc.PolygonSprite.extend
 	{
 		this.splurt = splurt;
 	},	
+	
+	createBody:function ( position, rotation, vertices, density, friction, restitution )
+	{
+		cp.convexHull ( vertices, null, 2 );
+		
+		var		body = cc.PhysicsBody.createPolygon ( vertices, cc.PhysicsMaterial ( density, restitution, friction ) );
+		
+		body.setCategoryBitmask  ( 0 );
+		body.setCollisionBitmask ( 0 );
+		
+		return body;
+	}
 });
 
 cc.PolygonSpriteEx.State =

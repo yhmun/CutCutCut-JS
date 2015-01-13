@@ -65,7 +65,7 @@ var VisibleRect =
 	bottom:function ( )
 	{
 		VisibleRect.lazyInit ( );
-		return cc.p ( s_visibleRect.x + s_visibleRect.width / 2, s_visibleRect.y + 200 );
+		return cc.p ( s_visibleRect.x + s_visibleRect.width / 2, s_visibleRect.y );
 	},
 
 	center:function ( )
