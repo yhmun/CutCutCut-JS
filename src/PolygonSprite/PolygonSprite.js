@@ -38,7 +38,7 @@ cc.PolygonSprite = cc.PRFilledPolygon.extend
 		this._super ( );
 		
 		this.body = null;
-		this.isOriginal = false;
+		this._isOriginal = false;
 		this.centroid = cp.vzero;
 	},
 
@@ -62,7 +62,7 @@ cc.PolygonSprite = cc.PRFilledPolygon.extend
 				
 		this.initWithPoints ( points, texture );
 
-		this.isOriginal = isOriginal;
+		this._isOriginal = isOriginal;
 		this.centroid = cc.PhysicsShape.getPolyonCenter ( points ); 
 
 		this.setAnchorPoint ( cp.v ( this.centroid.x / texture.getContentSize ( ).width, this.centroid.y / texture.getContentSize ( ).height ) );
@@ -83,6 +83,11 @@ cc.PolygonSprite = cc.PRFilledPolygon.extend
 		this.getPhysicsBody ( ).setCollisionBitmask ( 0 );
 	},
 
+	isOriginal:function ( )
+	{
+		return this._isOriginal;
+	},
+	
 	//setPosition:function ( Position )
 	//{
 		

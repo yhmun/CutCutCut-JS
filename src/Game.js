@@ -123,7 +123,7 @@ msw.Game = cc.Layer.extend
 	    this.addChild ( this.blade_sparkle, 3 );
 	    
 		// initialize all sound 
-//	    cc.audioEngine.playMusic ( "res/Sounds/nature_bgm.mp3" );		
+	    cc.audioEngine.playMusic ( "res/Sounds/nature_bgm.mp3" );		
 
 	    this.scheduleUpdate ( );
 	},
@@ -165,7 +165,7 @@ msw.Game = cc.Layer.extend
 		for ( var i = 0; i < 10; i++ )
 		{
 			var		sprite = new msw.Watermelon ( );
-			sprite.setPosition ( cp.v.add ( VisibleRect.leftBottom ( ), cc.p ( -64 * ( i + 1 ), -128 ) ) );			
+			sprite.setPosition ( cp.v.add ( VisibleRect.leftBottom ( ), cc.p ( -64 * ( i + 1 ), -64 ) ) );			
 	
 			this.addChildEx ( sprite, 1 );
 			this.addChild ( sprite.getSplurt ( ), 3 );			
@@ -175,7 +175,7 @@ msw.Game = cc.Layer.extend
 		for ( var i = 0; i < 10; i++ )
 		{
 			var		sprite = new msw.Strawberry ( );
-			sprite.setPosition ( cp.v.add ( VisibleRect.leftBottom ( ), cc.p ( -64 * ( i + 1 ), -128 ) ) );
+			sprite.setPosition ( cp.v.add ( VisibleRect.leftBottom ( ), cc.p ( -64 * ( i + 1 ), -64 ) ) );
 
 			this.addChildEx ( sprite, 1 );
 			this.addChild ( sprite.getSplurt ( ), 3 );			
@@ -185,7 +185,7 @@ msw.Game = cc.Layer.extend
 		for ( var i = 0; i < 10; i++ )
 		{
 			var		sprite = new msw.Pineapple ( );
-			sprite.setPosition ( cp.v.add ( VisibleRect.leftBottom ( ), cc.p ( -64 * ( i + 1 ), -128 ) ) );			
+			sprite.setPosition ( cp.v.add ( VisibleRect.leftBottom ( ), cc.p ( -64 * ( i + 1 ), -64 ) ) );			
 
 			this.addChildEx ( sprite, 1 );
 			this.addChild ( sprite.getSplurt ( ), 3 );			
@@ -195,7 +195,7 @@ msw.Game = cc.Layer.extend
 		for ( var i = 0; i < 10; i++ )
 		{
 			var		sprite = new msw.Grapes ( );			
-			sprite.setPosition ( cp.v.add ( VisibleRect.leftBottom ( ), cc.p ( -64 * ( i + 1 ), -128 ) ) );
+			sprite.setPosition ( cp.v.add ( VisibleRect.leftBottom ( ), cc.p ( -64 * ( i + 1 ), -64 ) ) );
 
 			this.addChildEx ( sprite, 1 );
 			this.addChild ( sprite.getSplurt ( ), 3 );			
@@ -205,7 +205,7 @@ msw.Game = cc.Layer.extend
 		for ( var i = 0; i < 10; i++ )
 		{
 			var		sprite = new msw.Banana ( );
-			sprite.setPosition ( cp.v.add ( VisibleRect.leftBottom ( ), cc.p ( -64 * ( i + 1 ), -128 ) ) );
+			sprite.setPosition ( cp.v.add ( VisibleRect.leftBottom ( ), cc.p ( -64 * ( i + 1 ), -64 ) ) );
 			
 			this.addChildEx ( sprite, 1 );
 			this.addChild ( sprite.getSplurt ( ), 3 );			
@@ -215,7 +215,7 @@ msw.Game = cc.Layer.extend
 		for ( var i = 0; i < 3; i++ )
 		{
 			var		sprite = new msw.Bomb ( );
-			sprite.setPosition ( cp.v.add ( VisibleRect.leftBottom ( ), cc.p ( -64 * ( i + 1 ), -128 ) ) );
+			sprite.setPosition ( cp.v.add ( VisibleRect.leftBottom ( ), cc.p ( -64 * ( i + 1 ), -64 ) ) );
 	
 			this.addChildEx ( sprite, 1 );
 			this.addChild ( sprite.getSplurt ( ), 3 );			
@@ -234,9 +234,9 @@ msw.Game = cc.Layer.extend
 	    // add unfilled crosses at the upper right corner of the screen
 	    for ( var i = 0; i < 5; i++ )
 	    {
-			var		cross = new cc.Sprite ( "res/Images/x_unfilled.png" );
-			var		size  = cross.getContentSize ( );
-			cross.setPosition ( cc.p ( VisibleRect.right ( ).x - size.width / 2 - i * size.width, VisibleRect.top ( ).y - size.height / 2 ) );
+	    	var		cross = new cc.Sprite ( "res/Images/x_unfilled.png" );
+	    	var		size  = cross.getContentSize ( );
+	    	cross.setPosition ( cc.p ( VisibleRect.right ( ).x - size.width / 2 - i * size.width, VisibleRect.top ( ).y - size.height / 2 ) );
 	        this.addChild ( cross, 4 );
 	    }
 	    
@@ -285,21 +285,9 @@ msw.Game = cc.Layer.extend
 
 		if ( cp.v.dist ( this.start_point, this.end_point ) > 25 )
 		{
-			/*
-			m_pWorld->RayCast
-			(
-					m_pRaycastCallback, 
-					b2Vec2 ( m_tStartPoint.x / PTM_RATIO, m_tStartPoint.y / PTM_RATIO ),
-					b2Vec2 ( m_tEndPoint.x   / PTM_RATIO, m_tEndPoint.y   / PTM_RATIO ) 
-			);
+			this.getParent ( ).getPhysicsWorld ( ).rayCast ( this.slice.bind ( this ), this.start_point, this.end_point, null );			
+			this.getParent ( ).getPhysicsWorld ( ).rayCast ( this.slice.bind ( this ), this.end_point, this.start_point, null );
 
-			m_pWorld->RayCast 
-			(
-					m_pRaycastCallback, 
-					b2Vec2 ( m_tEndPoint.x	 / PTM_RATIO, m_tEndPoint.y	  / PTM_RATIO ),
-					b2Vec2 ( m_tStartPoint.x / PTM_RATIO, m_tStartPoint.y / PTM_RATIO ) 
-			);
-			 */
 			this.start_point = this.end_point;
 
 			// add a point to the blade
@@ -433,8 +421,8 @@ msw.Game = cc.Layer.extend
 					cc.audioEngine.playEffect ( "res/Sounds/toss_simultaneous.wav" );						 
 	            }
 				else if ( this.current_toss_type == msw.TossType.Consecutive )
-	            {				            
-	                // toss fruits consecutively
+				{				            
+					// toss fruits consecutively
 					for ( var i in this.caches )
 					{
 						var		sprite =  this.caches [ i ];
@@ -447,20 +435,20 @@ msw.Game = cc.Layer.extend
 	                        this.queued_for_toss--;
 	                        break;
 	                    }
-	                }							 
+					}							 
 	            }				
-	        }
-	       
-	        // randomize an interval
-	        if ( this.queued_for_toss == 0 )
+			}
+
+			// randomize an interval
+			if ( this.queued_for_toss == 0 )
 	        {
-	            // if no more fruits to toss, set a longer interval
-	            this.toss_interval = msw.frandom_range ( 2, 3 );
+	        	// if no more fruits to toss, set a longer interval
+	        	this.toss_interval = msw.frandom_range ( 2, 3 );
 	            this.next_toss_time = this.time_current + this.toss_interval;
 	        }
 	        else 
 	        {
-	            // if more fruits to toss, set a shorter interval
+	        	// if more fruits to toss, set a shorter interval
 	        	this.toss_interval = msw.frandom_range ( 0.3, 0.8 );
 	        	this.next_toss_time = this.time_current + this.toss_interval;
 	        }		
@@ -473,7 +461,7 @@ msw.Game = cc.Layer.extend
 	cleanSprites:function ( )
 	{
 		// we check for all tossed sprites that have dropped offscreen and reset them
-		for ( var i in this.caches )
+		for ( var i = 0; i < this.caches.length;  )
 		{
 			var		sprite =  this.caches [ i ];
 
@@ -485,6 +473,11 @@ msw.Game = cc.Layer.extend
 				// this means the sprite has dropped offscreen
 				if ( position.y < VisibleRect.bottom ( ).y - 64 && velocity_y < 0 )
 				{
+					this.caches.splice ( i, 1 );
+					this.removeChildEx ( sprite );
+					
+					cc.log ( "re" + i );
+					/*
 					sprite.setState ( cc.PolygonSpriteEx.State.Idle );
 					sprite.setSliceEntered ( false );
 					sprite.setSliceExited  ( false );
@@ -494,18 +487,45 @@ msw.Game = cc.Layer.extend
 					sprite.getPhysicsBody ( ).setVelocity ( cp.vzero );
 					sprite.getPhysicsBody ( ).setAngularVelocity ( 0.0 );
 					sprite.deactivateCollisions ( );
+					*/
 		            
 					if ( sprite.getType ( ) != cc.PolygonSpriteEx.Type.Bomb )
 					{
 						this.subtractLife ( );
-					}					 
+					}		
+					
+					continue;										
 				}				
 			}
+			
+			i++;
 		}
+		/*
+		// we check for all sliced pieces that have dropped offscreen and remove them
+		var		bodies = this.getParent ( ).getPhysicsWorld ( ).getAllBodies ( );		
+		for ( var i in bodies )
+		{
+			var		sprite = bodies [ i ].getNode ( );
+			
+			if ( sprite && sprite instanceof cc.PolygonSpriteEx )
+			{
+				var		pos = sprite.getPosition ( );
+				
+				if ( pos.x < VisibleRect.left ( ).x - 64 || pos.x > VisibleRect.right ( ).x + 64 || pos.y < VisibleRect.bottom ( ).y - 64 )
+				{
+					if ( sprite.isOriginal ( ) )
+					{
+						cc.log ( "re" + i );
+						
+					}
+				}				
+			}		 	
+		}
+		*/
 		
 		/*
 
-		// we check for all sliced pieces that have dropped offscreen and remove them
+		
 		const CCSize&	tWinSize = CCDirector::sharedDirector ( )->getWinSize ( );
 		for ( b2Body* b = m_pWorld->GetBodyList ( ); b; b = b->GetNext ( ) )
 		{
@@ -532,7 +552,7 @@ msw.Game = cc.Layer.extend
 	tossSprite:function ( sprite )
 	{
 		// set a random position and rotation rate
-		var		random_position = cp.v ( msw.frandom_range ( VisibleRect.left ( ).x + 128, VisibleRect.right ( ).x - 128 ), VisibleRect.bottom ( ).y - 128 );
+		var		random_position = cp.v ( msw.frandom_range ( VisibleRect.left ( ).x + 64, VisibleRect.right ( ).x - 64 ), VisibleRect.bottom ( ).y - 64 );
 		var		random_angular_velocity = msw.frandom_range ( -1, 1 );
 
 		// limit the velocity based on their position so that sprites aren't tossed offscreen
@@ -550,6 +570,11 @@ msw.Game = cc.Layer.extend
 
 		sprite.getPhysicsBody ( ).setVelocity ( cp.v ( random_x_velocity, random_y_velocity ) );
 		sprite.getPhysicsBody ( ).setAngularVelocity ( random_angular_velocity );		
+	},
+	
+	slice:function ( world, info, data )
+	{
+		
 	},
 
 	/**
@@ -902,7 +927,7 @@ msw.Game = cc.Layer.extend
 
 		// passed all tests
 		return KD_TRUE;
-		*/
+		 */
 	},
 	
 	/**
@@ -936,27 +961,21 @@ msw.Game = cc.Layer.extend
 	 *	Subtracts the life of the player and checks if the game should end
 	 */
 	subtractLife:function ( )
-	{
-		/*
-		const CCSize&	tWinSize = CCDirector::sharedDirector ( )->getWinSize ( );
-		CCSize			tSize;
-
-		m_nLives--;
-
-		// replace the unfilled cross with a filled cross at the correct spot
-		CCSprite*		pLostLife = CCSprite::create ( "x_filled.png" );
-		tSize = pLostLife->getContentSize ( );
-		pLostLife->setPosition ( ccp ( tWinSize.cx - tSize.cx / 2 - m_nLives * tSize.cx, tWinSize.cy - tSize.cy / 2 ) );
-		this->addChild ( pLostLife, 4 );
-
-		SimpleAudioEngine::sharedEngine ( )->playEffect ( "lose_life.wav" );
-
+	{		
+		this.lives--;
+	
+    	var		lost_life = new cc.Sprite ( "res/Images/x_filled.png" );
+    	var		size  = lost_life.getContentSize ( );
+    	lost_life.setPosition ( cc.p ( VisibleRect.right ( ).x - size.width / 2 - this.lives * size.width, VisibleRect.top ( ).y - size.height / 2 ) );
+        this.addChild ( lost_life, 4 );
+        
+		cc.audioEngine.playEffect ( "res/Sounds/lose_life.wav" );
+		
 		// end the game if there are no more lives
-		if ( m_nLives <= 0 )
+		if ( this.lives <= 0 )
 		{
-			this->endGame ( );
+			this.endGame ( );
 		}
-		*/
 	},
 	
 	/**
@@ -964,14 +983,14 @@ msw.Game = cc.Layer.extend
 	 */
 	endGame:function ( )
 	{
-		/*
-		this->unscheduleUpdate ( );
-
-		CCMenuItemLabel*	pLabel = CCMenuItemLabel::create ( CCLabelTTF::create ( "RESTART", "Marker Felt.ttf", 50 ), this, menu_selector ( GameScene::restart ) );
-		CCMenu*				pMenu  = CCMenu::create ( pLabel, KD_NULL );
-		pMenu->setPosition ( ccpMid ( CCDirector::sharedDirector ( )->getWinSize ( ) ) );
-		this->addChild ( pMenu, 4 );
-		*/
+		this.unscheduleUpdate ( );
+		
+		var		label = new cc.MenuItemLabel ( new cc.LabelTTF ( "RESTART", "res/Fonts/Marker Felt.ttf", 50 ) , this.restart, this );
+		label.setPosition ( VisibleRect.center ( ) );
+		
+		var		menu = new cc.Menu ( label );	
+		menu.setPosition ( cc.p ( 0, 0 ) );
+		this.addChild ( menu, 4 );	
 	},
 	
 	restart:function ( sender )
